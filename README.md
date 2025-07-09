@@ -99,6 +99,5 @@ pip install pandas numpy matplotlib scikit-learn statsmodels joblib
 
 ## 🧠 Catatan Tambahan
 
-* Model SARIMAX ini **tidak cocok untuk prediksi jangka panjang** (>10 minggu) **jika tidak disertai prediksi fitur eksternal (Google Trends)**.
 * Untuk prediksi jangka panjang, gunakan juga model `sarima_trend_model.pkl` untuk memprediksi `trend_lag_2`, `trend_lag_3` terlebih dahulu.
 * Gunakan normalisasi yang **sama seperti saat training**. Jangan `fit` ulang scaler pada data baru.

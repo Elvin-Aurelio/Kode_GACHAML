@@ -6,10 +6,10 @@ Repositori ini berisi eksperimen dan pengembangan model prediksi penjualan mobil
 
 ```
 .
-├── datathon_analysis.pkl       # Model SARIMA final yang sudah dilatih
-├── predict.py             # Script untuk melakukan
-├── datathon_model.ipynb   # Notebook utama yang berisi seluruh eksperimen
-└── README.md              # Dokumentasi proyek
+├── datathon_analysis.pkl       # Insight yang di dapat dari dataset
+├── predict.py                  # Script untuk melakukan
+├── datathon_model.ipynb        # Notebook utama yang berisi seluruh eksperimen
+└── README.md                   # Dokumentasi proyek
 ```
 
 ## ⚙️ Fitur Proyek

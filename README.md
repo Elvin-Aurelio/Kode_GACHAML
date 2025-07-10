@@ -49,8 +49,7 @@ pip install pandas numpy matplotlib seaborn joblib statsmodels scikit-learn
 
 ### 2. Jalankan Prediksi
 
-Pastikan file `sarima_model.pkl` ada di folder yang sama dengan `predict.py`, lalu jalankan (file sarima_model.pkl dapat diakses melalui link berikut: [sarima_model.pkl](https://github.com/Elvin-Aurelio/Model_GACHAML)   # Model SARIMA final
-):
+Pastikan file `sarima_model.pkl` ada di folder yang sama dengan `predict.py`, lalu jalankan (file sarima_model.pkl dapat diakses melalui link berikut: [sarima_model.pkl](Elvin-Aurelio/Model_GACHAML)):
 
 ```bash
 python predict.py

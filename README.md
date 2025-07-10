@@ -1,103 +1,101 @@
-## 🚗 Prediksi Penjualan Mobil Mingguan dengan SARIMAX + Google Trends
+# 📈 Bagian 1: Prediksi Penjualan Mobil Mingguan dengan SARIMA
 
-Proyek ini menggunakan model **SARIMAX** untuk memprediksi jumlah unit mobil yang terjual setiap minggu. Model memanfaatkan **fitur eksternal (exogenous)** berupa data Google Trends dengan preprocessing dan **normalisasi** data.
+Repositori ini berisi eksperimen dan pengembangan model prediksi penjualan mobil mingguan menggunakan pendekatan time series klasik: **SARIMA**. Beberapa pendekatan alternatif seperti penggunaan fitur eksternal dari Google Trends dan hybrid model sempat dieksplorasi, namun **tidak memberikan peningkatan signifikan**, sehingga **model final tetap menggunakan SARIMA murni**.
 
-Model dan scaler disimpan dalam bentuk `.pkl` agar bisa digunakan kembali oleh pengguna lain (misal untuk deployment via Hugging Face atau Streamlit).
+## 📂 Struktur Folder
 
----
-
-## 🔧 Fitur
-
-* Model time series berbasis **SARIMAX (Seasonal ARIMA with Exogenous Regressors)**.
-* Eksternal feature dari Google Trends dengan keyword otomotif.
-* **Normalisasi** pada data target (`units_sold`) dan fitur (`trend_lag_2`, `trend_lag_3`).
-* **Cross-validation khusus time series (TSCV)**.
-* Evaluasi model dengan **MAE**, **sMAPE**, dan **LogRMSE**.
-* Model dan scaler disimpan untuk inference di masa depan.
-
----
-
-## 🗂 File
-
-| File                       | Deskripsi                                                                      |
-| -------------------------- | ------------------------------------------------------------------------------ |
-| `sarimax_scaled_model.pkl` | Model SARIMAX terlatih pada data penjualan mobil + trend (sudah dinormalisasi) |
-| `sarima_trend_model.pkl`   | Model SARIMA untuk memprediksi Google Trends mingguan ke depan                 |
-| `scaler_y.pkl`             | Scaler untuk menormalisasi/denormalisasi `units_sold`                          |
-| `scaler_X.pkl`             | Scaler untuk `trend_lag_2`, `trend_lag_3`                                      |
-| `scaler_trend.pkl`         | Scaler khusus untuk data Google Trends (avg\_trend)                            |
-
----
-
-## 🧪 Cara Penggunaan
-
-### 1. Load Model dan Scaler
-
-```python
-import joblib
-import pandas as pd
-
-# Load model dan scaler
-sarimax_model = joblib.load("sarimax_scaled_model.pkl")
-scaler_y = joblib.load("scaler_y.pkl")
-scaler_X = joblib.load("scaler_X.pkl")
+```
+.
+├── sarima_model.pkl       # Model SARIMA final yang sudah dilatih
+├── predict.py             # Script untuk melakukan
+├── datathon_model.ipynb   # Notebook utama yang berisi seluruh eksperimen
+└── README.md              # Dokumentasi proyek
 ```
 
-### 2. Siapkan Data Baru
+## ⚙️ Fitur Proyek
 
-```python
-# Contoh data mingguan baru (pastikan kolom sama dan index bertipe datetime)
-new_data = pd.DataFrame({
-    'trend_lag_2': [...],
-    'trend_lag_3': [...]
-}, index=pd.date_range(start='2025-07-01', periods=10, freq='W'))
+* Prediksi penjualan mobil per minggu berdasarkan data historis
+* Evaluasi menggunakan sMAPE, MAE, log-RMSE, dan R²
+* Implementasi Time Series Cross-Validation (TSCV)
+* Eksperimen tambahan:
 
-# Normalisasi
-X_new_scaled = scaler_X.transform(new_data)
-```
+  * SARIMAX (dengan Google Trends) — *tidak dipakai di model final*
+  * Hybrid SARIMA + Polynomial Regression — *hanya eksplorasi*
 
-### 3. Forecast
+## 🧪 Dataset
 
-```python
-forecast_scaled = sarimax_model.forecast(steps=10, exog=X_new_scaled)
+Dataset utama: `car_data.csv`
 
-# Denormalisasi hasil forecast
-forecast_final = scaler_y.inverse_transform(forecast_scaled.reshape(-1, 1)).flatten()
-```
+* Fitur utama: Tanggal dan Car ID
+* Penjualan dihitung per minggu
 
----
+## 📊 Hasil Utama
 
-## 📊 Evaluasi
+| Model                          | Mean sMAPE  |
+| ------------------------------ | ----------- |
+| **SARIMA (FINAL)**             | **14.8%** |
+| SARIMAX + Google Trends        | 15.2%     |
+| SARIMA + Polynomial Regression | 19.4%    |
 
-| Metrik  | Nilai |
-| ------- | -------------- |
-| MAE     | 55.1           |
-| sMAPE   | 15.6%          |
-| LogRMSE | 0.18           |
+Model SARIMA dipilih karena memberikan hasil yang kompetitif dan stabil tanpa membutuhkan data eksternal tambahan.
 
-> Evaluasi dilakukan pada data asli (setelah denormalisasi) agar hasilnya bisa ditafsirkan secara bisnis.
+## 🧠 Cara Pakai
 
----
-
-## 📦 Requirements
-
-* Python 3.8+
-* `pandas`
-* `numpy`
-* `matplotlib`
-* `scikit-learn`
-* `statsmodels`
-* `joblib`
-
-Install dengan:
+### 1. Instalasi Dependensi
 
 ```bash
-pip install pandas numpy matplotlib scikit-learn statsmodels joblib
+pip install pandas numpy matplotlib seaborn joblib statsmodels scikit-learn
 ```
+
+### 2. Jalankan Prediksi
+
+Pastikan file `sarima_model.pkl` ada di folder yang sama dengan `predict.py`, lalu jalankan:
+
+```bash
+python predict.py
+```
+
+Output akan berupa prediksi penjualan mobil 10 minggu ke depan.
+
+## 📈 Visualisasi
+
+Model telah divisualisasikan lengkap dalam `datathon_model.ipynb`, termasuk evaluasi per fold dan perbandingan antar pendekatan.
+
+## ❌ Kenapa Tidak Pakai Google Trends?
+
+Eksperimen menggunakan data eksternal (Google Trends) sempat dilakukan dengan pendekatan SARIMAX dan normalisasi, namun:
+
+* Model tidak menunjukkan perbaikan signifikan
+* Menambah kompleksitas pipeline
+
+Akhirnya model SARIMA standar dipilih sebagai solusi terbaik.
+
 
 ---
 
-## 🧠 Catatan Tambahan
+## 🧠 Bagian 2: Analisis Distribusi Penjualan
 
-* Untuk prediksi jangka panjang, gunakan juga model `sarima_trend_model.pkl` untuk memprediksi `trend_lag_2`, `trend_lag_3` terlebih dahulu.
-* Gunakan normalisasi yang **sama seperti saat training**. Jangan `fit` ulang scaler pada data baru.
+Notebook `datathon_analysis.ipynb` berisi analisis spasial dari penjualan mobil untuk menjawab pertanyaan seperti:
+
+* **Wilayah mana yang paling banyak menyerap stok mobil?**
+* **Jenis mobil apa yang paling banyak diminati di tiap region?**
+* **Perlu tidaknya redistribusi stok antar dealer/daerah?**
+
+### 📍 Contoh Insight:
+
+* Model **Prizm** paling laku di Austin (96 unit) dan Janesville (81 unit) Ini jadi sinyal kuat bahwa Prizm cocok diprioritaskan di dua wilayah itu.
+* Model **Diamante** perlu perhatian khusus pada warna Merah karena proporsinya cukup besar.
+* **Distribusi stok** perlu disesuaikan berdasarkan tren lokal dan historis penjualan
+
+Insight semacam ini bisa digunakan untuk menyarankan:
+
+* Optimasi logistik dan pengiriman
+* Strategi pemasaran lokal
+* Perencanaan pengadaan stok ke depannya
+
+---
+
+```bash
+pip install pandas numpy matplotlib seaborn joblib statsmodels scikit-learn gender-guesser pytrends
+```
+
